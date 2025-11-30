@@ -1,116 +1,138 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as Location from 'expo-location';
-import * as TaskManager from 'expo-task-manager';
-import { database, ref, onValue, set } from './src/config/firebase';
+// import * as Location from 'expo-location';
+// import * as TaskManager from 'expo-task-manager';
+// import { database, ref, onValue, set } from './src/config/firebase';
 
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
 
 const Stack = createNativeStackNavigator();
 
-// Background location task
-const LOCATION_TASK_NAME = 'background-location-task';
+// ===== GPS DISABLED FOR EXPO GO TESTING =====
+// Uncomment below when building with EAS for production
 
-// Define the background task
-TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-  if (error) {
-    console.error('Background location error:', error);
-    return;
-  }
-  if (data) {
-    const { locations } = data;
-    const location = locations[0];
+// // Background location task
+// const LOCATION_TASK_NAME = 'background-location-task';
 
-    // Update Firebase with new location
-    const locationData = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      accuracy: location.coords.accuracy,
-      timestamp: Date.now(),
-    };
+// // Define the background task
+// TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+//   if (error) {
+//     console.error('Background location error:', error);
+//     return;
+//   }
+//   if (data) {
+//     const { locations } = data;
+//     const location = locations[0];
 
-    const locationRef = ref(database, 'driverLocation');
-    set(locationRef, locationData).catch(console.error);
+//     // Update Firebase with new location
+//     const locationData = {
+//       latitude: location.coords.latitude,
+//       longitude: location.coords.longitude,
+//       accuracy: location.coords.accuracy,
+//       timestamp: Date.now(),
+//     };
 
-    console.log('Background location updated:', locationData);
-  }
-});
+//     const locationRef = ref(database, 'driverLocation');
+//     set(locationRef, locationData).catch(console.error);
+
+//     console.log('Background location updated:', locationData);
+//   }
+// });
 
 export default function App() {
-  const [locationTracking, setLocationTracking] = useState(false);
+  // ===== GPS FUNCTIONS DISABLED FOR EXPO GO TESTING =====
 
-  // Restore GPS state from Firebase on mount
-  useEffect(() => {
-    const gpsStateRef = ref(database, 'driverGPSEnabled');
-    const unsubscribe = onValue(gpsStateRef, async (snapshot) => {
-      const isEnabled = snapshot.val();
-      if (isEnabled && !locationTracking) {
-        await startBackgroundLocation();
-      } else if (!isEnabled && locationTracking) {
-        await stopBackgroundLocation();
-      }
-    });
+  // // Check if location tracking is currently active
+  // const checkLocationStatus = async () => {
+  //   try {
+  //     return await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+  //   } catch {
+  //     return false;
+  //   }
+  // };
 
-    return () => unsubscribe();
-  }, [locationTracking]);
+  // // Restore GPS state from Firebase on mount
+  // useEffect(() => {
+  //   const gpsStateRef = ref(database, 'driverGPSEnabled');
+  //   const unsubscribe = onValue(gpsStateRef, async (snapshot) => {
+  //     const isEnabled = snapshot.val();
+  //     const isTracking = await checkLocationStatus();
 
-  const startBackgroundLocation = async () => {
-    try {
-      // Request permissions
-      const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
-      if (foregroundStatus !== 'granted') {
-        console.error('Foreground permission not granted');
-        return;
-      }
+  //     if (isEnabled && !isTracking) {
+  //       await startBackgroundLocation();
+  //     } else if (!isEnabled && isTracking) {
+  //       await stopBackgroundLocation();
+  //     }
+  //   });
 
-      const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-      if (backgroundStatus !== 'granted') {
-        console.error('Background permission not granted');
-        return;
-      }
+  //   return () => unsubscribe();
+  // }, []);
 
-      // Start background location updates
-      await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 60000, // Update every 60 seconds
-        distanceInterval: 10, // Or every 10 meters
-        foregroundService: {
-          notificationTitle: 'TNZ GPS Aktywny',
-          notificationBody: 'Lokalizacja jest śledzona w tle',
-          notificationColor: '#667eea',
-        },
-      });
+  // const startBackgroundLocation = async () => {
+  //   try {
+  //     // Request permissions
+  //     const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+  //     if (foregroundStatus !== 'granted') {
+  //       console.error('Foreground permission not granted');
+  //       return;
+  //     }
 
-      setLocationTracking(true);
-      console.log('Background location started');
-    } catch (error) {
-      console.error('Error starting background location:', error);
-    }
-  };
+  //     const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+  //     if (backgroundStatus !== 'granted') {
+  //       console.error('Background permission not granted');
+  //       return;
+  //     }
 
-  const stopBackgroundLocation = async () => {
-    try {
-      const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-      if (hasStarted) {
-        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-      }
-      setLocationTracking(false);
-      console.log('Background location stopped');
-    } catch (error) {
-      console.error('Error stopping background location:', error);
-    }
-  };
+  //     // Start background location updates
+  //     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+  //       accuracy: Location.Accuracy.High,
+  //       timeInterval: 60000, // Update every 60 seconds
+  //       distanceInterval: 10, // Or every 10 meters
+  //       foregroundService: {
+  //         notificationTitle: 'TNZ GPS Aktywny',
+  //         notificationBody: 'Lokalizacja jest śledzona w tle',
+  //         notificationColor: '#667eea',
+  //       },
+  //     });
+
+  //     console.log('Background location started');
+  //   } catch (error) {
+  //     console.error('Error starting background location:', error);
+  //   }
+  // };
+
+  // const stopBackgroundLocation = async () => {
+  //   try {
+  //     const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+  //     if (hasStarted) {
+  //       await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+  //     }
+  //     console.log('Background location stopped');
+  //   } catch (error) {
+  //     console.error('Error stopping background location:', error);
+  //   }
+  // };
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      documentTitle={{
+        formatter: (options, route) => 'Panel Kierowcy - 904 - TNŻ'
+      }}
+    >
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: 'Panel Kierowcy - 904 - TNŻ'
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
