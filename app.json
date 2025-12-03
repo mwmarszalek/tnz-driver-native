@@ -15,7 +15,14 @@
     },
     "android": {
       "package": "com.tnz.driver",
-      "versionCode": 2
+      "versionCode": 3,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION"
+      ]
     },
     "web": {
       "title": "Panel Kierowcy - 904 - TNŻ",
@@ -25,7 +32,9 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Aplikacja TNZ potrzebuje dostępu do lokalizacji w tle aby śledzić pozycję autobusu."
+          "locationAlwaysAndWhenInUsePermission": "Aplikacja TNZ potrzebuje dostępu do lokalizacji w tle aby śledzić pozycję autobusu.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
         }
       ]
     ],
