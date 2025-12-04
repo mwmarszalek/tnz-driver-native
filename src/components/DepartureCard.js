@@ -91,7 +91,7 @@ const DepartureCard = ({
     >
       {isNext && <NextBadge minutesToDeparture={minutesToDeparture} />}
 
-      <View style={styles.header}>
+      <View style={[styles.header, isNext && styles.headerRounded]}>
         <View style={styles.timeWrapper}>
           <Text style={styles.time}>{timeOnly}</Text>
           {time !== timeOnly && (
@@ -105,7 +105,7 @@ const DepartureCard = ({
         </Text>
       </View>
 
-      <View style={styles.stopsList}>
+      <View style={[styles.stopsList, !isNext && styles.stopsListNoPadding]}>
         {requestedStops.length === 0 ? (
           <NoStops />
         ) : (
@@ -121,7 +121,7 @@ const DepartureCard = ({
       </View>
 
       {minutesToDeparture <= 0 && (
-        <View style={styles.completeBtnContainer}>
+        <View style={[styles.completeBtnContainer, !isNext && styles.completeBtnContainerNoPadding]}>
           <TouchableOpacity
             style={[
               styles.completeBtn,
@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 20,
     marginBottom: 20,
+    overflow: "hidden",
     borderWidth: 3,
     borderColor: COLORS.border,
     shadowColor: "#000",
@@ -151,13 +152,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 15,
     elevation: 5,
-    padding: 15,
   },
   nextCard: {
     borderColor: COLORS.warning,
     backgroundColor: "#fff5f3",
     shadowColor: COLORS.warning,
     shadowOpacity: 0.25,
+    padding: 15,
   },
   completedCard: {
     borderColor: COLORS.success,
@@ -171,6 +172,8 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 25,
     backgroundColor: COLORS.primary,
+  },
+  headerRounded: {
     borderRadius: 12,
   },
   timeWrapper: {
@@ -204,7 +207,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     backgroundColor: COLORS.success,
     gap: 15,
-    borderRadius: 12,
   },
   completedCheckmarkCircle: {
     width: 32,
@@ -235,14 +237,22 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.8)",
   },
   stopsList: {
-    paddingTop: 15,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
     paddingBottom: 0,
   },
+  stopsListNoPadding: {
+    paddingHorizontal: 20,
+  },
   completeBtnContainer: {
-    paddingBottom: 5,
+    paddingHorizontal: 25,
+    paddingBottom: 20,
     borderTopWidth: 1,
     borderTopColor: "#f0f0f0",
     paddingTop: 15,
+  },
+  completeBtnContainerNoPadding: {
+    paddingHorizontal: 25,
   },
   completeBtn: {
     width: "100%",
