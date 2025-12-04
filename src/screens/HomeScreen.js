@@ -51,11 +51,8 @@ export default function HomeScreen() {
 
   const startLocationTracking = async () => {
     try {
-      console.log('🚀 Platform detected:', Platform.OS, 'IS_WEB:', IS_WEB);
-
       // WEB: Mock GPS simulation
       if (IS_WEB) {
-        console.log('📱 Using MOCK GPS (web mode)');
         const mockLocation = {
           latitude: 53.416454,
           longitude: 14.549563,
@@ -63,15 +60,11 @@ export default function HomeScreen() {
           timestamp: Date.now(),
         };
 
-        console.log("🌐 [WEB] Setting mock GPS location:", mockLocation);
-
         const locationRef = ref(database, "driverLocation");
         await set(locationRef, mockLocation);
-        console.log("✅ [WEB] Mock location written to Firebase");
 
         const gpsStateRef = ref(database, "driverGPSEnabled");
         await set(gpsStateRef, true);
-        console.log("✅ [WEB] driverGPSEnabled set to true");
 
         // Simulate location updates every 60 seconds
         webLocationInterval.current = setInterval(async () => {
@@ -82,7 +75,6 @@ export default function HomeScreen() {
             accuracy: 10 + Math.random() * 5,
             timestamp: Date.now(),
           };
-          console.log("🔄 [WEB] Updating mock location:", updatedLocation);
           await set(locationRef, updatedLocation);
         }, 60000);
 
@@ -90,7 +82,6 @@ export default function HomeScreen() {
       }
 
       // NATIVE: Real GPS
-      console.log('📡 Using REAL GPS (native mode)');
       const { status: foregroundStatus } =
         await Location.requestForegroundPermissionsAsync();
       if (foregroundStatus !== "granted") {
@@ -241,22 +232,41 @@ export default function HomeScreen() {
       return false;
     }
 
-    if (completedCourses[departureTime]) {
+    // Check if manually completed
+    if (completedCourses[departureTime]?.completed) {
       return true;
     }
 
+    // Auto-complete if more than 10 minutes past departure
     const minutesToDeparture = getMinutesToDeparture(departureTime);
-    return minutesToDeparture !== null && minutesToDeparture < -10;
+    const autoCompleted = minutesToDeparture !== null && minutesToDeparture < -10;
+
+    // Store auto-completed courses (but mark as NOT manual)
+    if (autoCompleted && !completedCourses[departureTime]) {
+      setCompletedCourses(prev => ({
+        ...prev,
+        [departureTime]: { completed: true, manual: false }
+      }));
+    }
+
+    return autoCompleted;
   };
 
   const markAsCompleted = (time) => {
-    setCompletedCourses({ ...completedCourses, [time]: true });
+    // Mark as completed manually
+    setCompletedCourses({
+      ...completedCourses,
+      [time]: { completed: true, manual: true }
+    });
   };
 
   const markAsIncomplete = (time) => {
-    const updated = { ...completedCourses };
-    delete updated[time];
-    setCompletedCourses(updated);
+    // Only allow unmarking if it was marked manually
+    if (completedCourses[time]?.manual) {
+      const updated = { ...completedCourses };
+      delete updated[time];
+      setCompletedCourses(updated);
+    }
   };
 
   const toggleExpandCompleted = (time) => {
@@ -411,17 +421,19 @@ export default function HomeScreen() {
                             );
                           })}
                         </View>
-                        <View style={styles.completeBtnContainer}>
-                          <TouchableOpacity
-                            style={[styles.completeBtn, styles.incompleteBtn]}
-                            onPress={() => markAsIncomplete(time)}
-                            activeOpacity={0.8}
-                          >
-                            <Text style={styles.completeBtnText}>
-                              ↺ Oznacz jako niewykonany
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
+                        {completedCourses[time]?.manual && (
+                          <View style={styles.completeBtnContainer}>
+                            <TouchableOpacity
+                              style={[styles.completeBtn, styles.incompleteBtn]}
+                              onPress={() => markAsIncomplete(time)}
+                              activeOpacity={0.8}
+                            >
+                              <Text style={styles.completeBtnText}>
+                                ↺ Cofnij
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
                       </>
                     )}
                   </TouchableOpacity>
@@ -476,25 +488,24 @@ export default function HomeScreen() {
                       )}
                     </View>
 
-                    {requestedStops.length > 0 &&
-                      (isNext || getMinutesToDeparture(time) < 0) && (
-                        <View style={styles.completeBtnContainer}>
-                          <TouchableOpacity
-                            style={[
-                              styles.completeBtn,
-                              currentTime.getHours() >= 17 &&
-                                styles.completeBtnDisabled,
-                            ]}
-                            onPress={() => markAsCompleted(time)}
-                            disabled={currentTime.getHours() >= 17}
-                            activeOpacity={0.8}
-                          >
-                            <Text style={styles.completeBtnText}>
-                              ✓ Oznacz jako wykonany
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      )}
+                    {getMinutesToDeparture(time) <= 0 && (
+                      <View style={styles.completeBtnContainer}>
+                        <TouchableOpacity
+                          style={[
+                            styles.completeBtn,
+                            currentTime.getHours() >= 17 &&
+                              styles.completeBtnDisabled,
+                          ]}
+                          onPress={() => markAsCompleted(time)}
+                          disabled={currentTime.getHours() >= 17}
+                          activeOpacity={0.8}
+                        >
+                          <Text style={styles.completeBtnText}>
+                            ✓ Oznacz jako wykonany
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </>
                 )}
               </View>
@@ -815,7 +826,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   incompleteBtn: {
-    backgroundColor: "#ef4444",
+    backgroundColor: "#3b82f6",
   },
   completeBtnText: {
     color: "white",
