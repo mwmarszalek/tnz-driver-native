@@ -468,9 +468,6 @@ export default function HomeScreen() {
                           <Text style={styles.noStopsText}>
                             Brak zamówionych przystanków
                           </Text>
-                          <Text style={styles.noStopsSubtext}>
-                            Ten kurs nie ma żadnych przystanków
-                          </Text>
                         </View>
                       ) : (
                         orderedRequestedStops.map((stop, index) => {
@@ -824,12 +821,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#374151",
-    marginBottom: 6,
-    textAlign: "center",
-  },
-  noStopsSubtext: {
-    fontSize: 13,
-    color: "#9ca3af",
     textAlign: "center",
   },
   completeBtnContainer: {
