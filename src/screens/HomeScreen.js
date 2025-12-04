@@ -461,9 +461,17 @@ export default function HomeScreen() {
 
                     <View style={styles.stopsList}>
                       {requestedStops.length === 0 ? (
-                        <Text style={styles.noStopsMsg}>
-                          Brak zamówionych przystanków
-                        </Text>
+                        <View style={styles.noStopsContainer}>
+                          <View style={styles.noStopsIcon}>
+                            <Text style={styles.noStopsIconText}>📍</Text>
+                          </View>
+                          <Text style={styles.noStopsText}>
+                            Brak zamówionych przystanków
+                          </Text>
+                          <Text style={styles.noStopsSubtext}>
+                            Ten kurs nie ma żadnych przystanków
+                          </Text>
+                        </View>
                       ) : (
                         orderedRequestedStops.map((stop, index) => {
                           const stopTime = stopTimes[stop] || "--:--";
@@ -785,18 +793,44 @@ const styles = StyleSheet.create({
     color: "#16a34a",
     backgroundColor: "rgba(22, 163, 74, 0.1)",
   },
-  noStopsMsg: {
-    backgroundColor: "#fff8e6",
-    borderWidth: 2,
-    borderColor: "#ffb74d",
-    borderStyle: "dashed",
-    padding: 18,
-    borderRadius: 14,
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#ff8c42",
+  noStopsContainer: {
+    alignItems: "center",
+    padding: 30,
     marginVertical: 10,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: "#e5e7eb",
+    borderStyle: "dashed",
+  },
+  noStopsIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#6E64C6",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+    shadowColor: "#6E64C6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  noStopsIconText: {
+    fontSize: 28,
+  },
+  noStopsText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 6,
+    textAlign: "center",
+  },
+  noStopsSubtext: {
+    fontSize: 13,
+    color: "#9ca3af",
+    textAlign: "center",
   },
   completeBtnContainer: {
     paddingHorizontal: 25,
