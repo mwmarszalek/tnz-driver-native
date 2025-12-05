@@ -5,7 +5,12 @@ import { DISPATCHER_PHONE } from "../constants/app";
 import { styles } from "./HomeScreen.styles";
 import { colors } from "../styles/theme";
 import { Header, DepartureCard, EmptyState } from "../components";
-import { useSchedule, useLocationTracking, useCourseCompletion } from "../hooks";
+import {
+  useSchedule,
+  useLocationTracking,
+  useCourseCompletion,
+  useLanguage,
+} from "../hooks";
 
 export default function HomeScreen() {
   const {
@@ -27,6 +32,8 @@ export default function HomeScreen() {
     toggleExpandCompleted,
   } = useCourseCompletion(getMinutesToDeparture);
 
+  const { language, toggleLanguage, t } = useLanguage();
+
   const callDispatcher = () => {
     Linking.openURL(`tel:${DISPATCHER_PHONE}`);
   };
@@ -45,6 +52,9 @@ export default function HomeScreen() {
           onCallDispatcher={callDispatcher}
           locationTracking={locationTracking}
           onToggleGPS={toggleGPS}
+          t={t}
+          language={language}
+          onToggleLanguage={toggleLanguage}
         />
 
         <ScrollView
@@ -81,11 +91,12 @@ export default function HomeScreen() {
                 isExpanded={expandedCompleted[time]}
                 isManuallyCompleted={completedCourses[time]?.manual}
                 currentHour={currentTime.getHours()}
+                t={t}
               />
             );
           })}
 
-          {!hasAnySchedules && <EmptyState />}
+          {!hasAnySchedules && <EmptyState t={t} />}
         </ScrollView>
       </View>
     </View>

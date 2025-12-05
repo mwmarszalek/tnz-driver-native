@@ -19,6 +19,7 @@ const DepartureCard = ({
   isExpanded,
   isManuallyCompleted,
   currentHour,
+  t,
 }) => {
   const allStopNames = Object.keys(stopTimes);
   const orderedRequestedStops = allStopNames.filter((x) =>
@@ -26,9 +27,9 @@ const DepartureCard = ({
   );
 
   const getStopCountText = (count) => {
-    if (count === 1) return "przystanek";
-    if (count >= 2 && count <= 4) return "przystanki";
-    return "przystanków";
+    if (count === 1) return t("stop");
+    if (count >= 2 && count <= 4) return t("stops2to4");
+    return t("stops5plus");
   };
 
   if (isCompleted) {
@@ -71,7 +72,7 @@ const DepartureCard = ({
                     onPress={onMarkIncomplete}
                     activeOpacity={0.8}
                   >
-                    <Text style={styles.completeBtnText}>↺ Cofnij</Text>
+                    <Text style={styles.completeBtnText}>↺ {t("undo")}</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -89,7 +90,7 @@ const DepartureCard = ({
         isNext && styles.nextCard,
       ]}
     >
-      {isNext && <NextBadge minutesToDeparture={minutesToDeparture} />}
+      {isNext && <NextBadge minutesToDeparture={minutesToDeparture} t={t} />}
 
       <View style={[styles.header, isNext && styles.headerRounded]}>
         <View style={styles.timeWrapper}>
@@ -107,7 +108,7 @@ const DepartureCard = ({
 
       <View style={[styles.stopsList, !isNext && styles.stopsListNoPadding]}>
         {requestedStops.length === 0 ? (
-          <NoStops />
+          <NoStops t={t} />
         ) : (
           orderedRequestedStops.map((stop, index) => (
             <StopItem
@@ -131,7 +132,7 @@ const DepartureCard = ({
             disabled={currentHour >= 17}
             activeOpacity={0.8}
           >
-            <Text style={styles.completeBtnText}>✓ Oznacz jako wykonany</Text>
+            <Text style={styles.completeBtnText}>✓ {t("markAsCompleted")}</Text>
           </TouchableOpacity>
         </View>
       )}
