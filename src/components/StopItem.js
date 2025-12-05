@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { COLORS } from "../constants/app";
+import { View, Text } from "react-native";
+import { styles } from "./StopItem.styles";
 
 const StopItem = ({ stopName, stopTime, index, isCompleted = false }) => {
   return (
@@ -17,52 +17,5 @@ const StopItem = ({ stopName, stopTime, index, isCompleted = false }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    backgroundColor: COLORS.background,
-    borderRadius: 12,
-    marginBottom: 10,
-    gap: 15,
-  },
-  stopNumber: {
-    width: 35,
-    height: 35,
-    borderRadius: 17.5,
-    backgroundColor: COLORS.primary,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  completedStopNumber: {
-    backgroundColor: COLORS.success,
-  },
-  stopNumberText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  stopName: {
-    flex: 1,
-    fontSize: 18,
-    color: COLORS.text,
-    fontWeight: "500",
-  },
-  stopTime: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: COLORS.secondary,
-    backgroundColor: "rgba(102, 126, 234, 0.1)",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  completedStopTime: {
-    color: COLORS.success,
-    backgroundColor: "rgba(22, 163, 74, 0.1)",
-  },
-});
 
 export default StopItem;

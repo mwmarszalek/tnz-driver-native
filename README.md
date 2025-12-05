@@ -44,6 +44,7 @@ eas build:configure
 ```
 
 Podczas konfiguracji:
+
 - Wybierz "All" gdy zapyta o platformy
 - Expo automatycznie utworzy `eas.json`
 
@@ -80,6 +81,7 @@ eas build --profile development --platform android
 ```
 
 Po zbudowaniu:
+
 1. Zainstaluj APK na urządzeniu
 2. Uruchom `npm start`
 3. Naciśnij "a" aby otworzyć na Androidzie
@@ -100,26 +102,6 @@ eas build --platform android --profile production
 
 Po zakończeniu budowania otrzymasz link do pobrania APK.
 
-## Publikacja w Google Play
-
-### 1. Przygotuj assets produkcyjne
-
-- Zamień placeholder `assets/icon.png` (1024x1024)
-- Zamień placeholder `assets/splash.png` (1284x2778)
-- Zamień placeholder `assets/adaptive-icon.png` (1024x1024)
-
-### 2. Zbuduj produkcyjny bundle
-
-```bash
-eas build --platform android --profile production
-```
-
-### 3. Submit do Google Play
-
-```bash
-eas submit --platform android
-```
-
 ## Uprawnienia Android
 
 Aplikacja wymaga następujących uprawnień:
@@ -132,7 +114,7 @@ Aplikacja wymaga następujących uprawnień:
 
 ## Architektura i struktura projektu
 
-Projekt został zorganizowany zgodnie z najlepszymi praktykami React Native:
+Projekt został zorganizowany zgodnie z najlepszymi praktykami React Native (o których wiedziałem :P)
 
 ```
 tnz-driver-native/
@@ -145,23 +127,33 @@ tnz-driver-native/
 │   ├── components/                 # Komponenty UI (reusable)
 │   │   ├── index.js                # Export wszystkich komponentów
 │   │   ├── Header.js               # Nagłówek z przyciskami GPS i dyspozytora
+│   │   ├── Header.styles.js        # Style dla Header
 │   │   ├── DepartureCard.js        # Karta kursu (główny komponent)
+│   │   ├── DepartureCard.styles.js # Style dla DepartureCard
 │   │   ├── NextBadge.js            # Badge "Najbliższy odjazd"
+│   │   ├── NextBadge.styles.js     # Style dla NextBadge
 │   │   ├── StopItem.js             # Element listy przystanków
+│   │   ├── StopItem.styles.js      # Style dla StopItem
 │   │   ├── NoStops.js              # Komunikat "Brak przystanków"
-│   │   └── EmptyState.js           # Stan pustej listy
+│   │   ├── NoStops.styles.js       # Style dla NoStops
+│   │   ├── EmptyState.js           # Stan pustej listy
+│   │   └── EmptyState.styles.js    # Style dla EmptyState
 │   ├── hooks/                      # Custom React hooks
 │   │   ├── index.js                # Export wszystkich hooks
 │   │   ├── useSchedule.js          # Logika rozkładu jazdy i czasu
 │   │   ├── useLocationTracking.js  # Logika GPS tracking
 │   │   └── useCourseCompletion.js  # Logika oznaczania kursów
 │   ├── screens/                    # Ekrany aplikacji
-│   │   └── HomeScreen.js           # Główny ekran (teraz refaktoryzowany)
+│   │   ├── HomeScreen.js           # Główny ekran
+│   │   └── HomeScreen.styles.js    # Style dla HomeScreen
+│   ├── styles/                     # System stylów
+│   │   └── theme.js                # Tylko zmienne: kolory, typografia, spacing, shadows
 │   ├── config/                     # Konfiguracja
 │   │   ├── firebase.js             # Firebase Realtime Database
 │   │   └── schedules.js            # Rozkład jazdy (dane)
-│   └── constants/                  # Stałe aplikacji
-│       └── app.js                  # Kolory, wartości czasowe, konfiguracja
+│   ├── constants/                  # Stałe aplikacji
+│   │   └── app.js                  # Wartości czasowe, konfiguracja
+│   └── utils/                      # Utility functions
 └── assets/                         # Ikony i splash screens
     ├── icon.png
     ├── adaptive-icon.png
@@ -175,18 +167,21 @@ tnz-driver-native/
 Aplikacja używa trzech głównych custom hooks do zarządzania logiką:
 
 #### `useSchedule()`
+
 - Zarządza stanem rozkładu jazdy z Firebase
 - Obsługuje aktualizację czasu co minutę
 - Oblicza czas do odjazdu dla każdego kursu
 - Znajduje najbliższy odjazd
 
 #### `useLocationTracking()`
+
 - Zarządza GPS tracking w tle
 - Obsługuje uprawnienia do lokalizacji
 - Wysyła pozycję do Firebase co 60 sekund
 - Wspiera zarówno Web (mock GPS) jak i Native (prawdziwy GPS)
 
 #### `useCourseCompletion()`
+
 - Zarządza oznaczaniem kursów jako wykonane
 - Automatyczne oznaczanie po 10 minutach od odjazdu
 - Rozróżnia manualne vs automatyczne oznaczenia
@@ -203,11 +198,59 @@ Wszystkie komponenty są w pełni modułowe i reusable:
 - **NoStops** - Komunikat gdy brak zamówionych przystanków
 - **EmptyState** - Stan pustej listy kursów
 
+### System Stylów
+
+Aplikacja używa prostego systemu stylów - każdy komponent ma swój plik `.styles.js`:
+
+**Struktura:**
+
+- `src/styles/theme.js` - **tylko zmienne** (colors, typography, spacing, borderRadius, shadows)
+- Każdy komponent ma osobny plik `.styles.js` obok głównego pliku
+
+**`src/styles/theme.js`** - Centralne zmienne:
+
+- `colors` - Paleta kolorów (primary, success, warning, text, background)
+- `typography` - Rozmiary czcionek i wagi (xs → huge, normal → extrabold)
+- `spacing` - Wartości odstępów (xs: 4px → massive: 60px)
+- `borderRadius` - Zaokrąglenia (sm: 8px → full: 9999px)
+- `shadows` - Pre-defined cienie (sm, md, lg, xl + color-specific)
+
+**Przykład - DepartureCard:**
+
+```javascript
+// DepartureCard.js
+import { View, Text } from "react-native";
+import { styles } from "./DepartureCard.styles";
+
+const DepartureCard = () => {
+  return <View style={styles.container}>...</View>;
+};
+
+// DepartureCard.styles.js
+import { StyleSheet } from "react-native";
+import { colors, spacing, shadows } from "../styles/theme";
+
+export const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.primary,
+    padding: spacing.xl,
+    ...shadows.lg,
+  },
+});
+```
+
+**Zalety:**
+
+- ✅ Prosty i przejrzysty - każdy komponent ma swoje style
+- ✅ Łatwe w utrzymaniu - style obok logiki komponentu
+- ✅ Brak nadmiernej abstrakcji - tylko używane wartości
+
 ## Zasady działania
 
 ### Oznaczanie kursów
 
 1. **Manualne oznaczenie** - kierowca klika "Oznacz jako wykonany"
+
    - Przycisk pojawia się gdy minie godzina odjazdu
    - Można cofnąć przyciskiem "Cofnij" (niebieski)
 
@@ -278,9 +321,10 @@ adb logcat
 
 ### Dodawanie nowego komponentu
 
-1. Stwórz plik w `src/components/NazwaKomponentu.js`
-2. Użyj `COLORS` z `src/constants/app.js` dla kolorów
-3. Dodaj export w `src/components/index.js`
+1. Stwórz plik komponentu: `src/components/NazwaKomponentu.js`
+2. Stwórz plik stylów: `src/components/NazwaKomponentu.styles.js`
+3. Import zmiennych z `theme.js`: `import { colors, spacing } from "../styles/theme"`
+4. Dodaj export w `src/components/index.js`
 
 ### Dodawanie nowego hooka
 
@@ -295,6 +339,7 @@ Edytuj `src/constants/app.js` - wszystkie wartości są tam scentralizowane.
 ## Kontakt
 
 W przypadku problemów sprawdź dokumentację Expo:
+
 - https://docs.expo.dev
 - https://docs.expo.dev/build/introduction/
 - https://docs.expo.dev/versions/latest/sdk/location/

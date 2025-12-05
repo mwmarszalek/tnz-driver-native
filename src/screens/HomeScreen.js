@@ -1,13 +1,11 @@
 import React from "react";
-import { View, ScrollView, StyleSheet, StatusBar, Linking } from "react-native";
+import { View, ScrollView, StatusBar, Linking } from "react-native";
 import { scheduleSchool904 } from "../config/schedules";
-import { DISPATCHER_PHONE, COLORS } from "../constants/app";
+import { DISPATCHER_PHONE } from "../constants/app";
+import { styles } from "./HomeScreen.styles";
+import { colors } from "../styles/theme";
 import { Header, DepartureCard, EmptyState } from "../components";
-import {
-  useSchedule,
-  useLocationTracking,
-  useCourseCompletion,
-} from "../hooks";
+import { useSchedule, useLocationTracking, useCourseCompletion } from "../hooks";
 
 export default function HomeScreen() {
   const {
@@ -41,7 +39,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.wrapper}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
       <View style={styles.container}>
         <Header
           onCallDispatcher={callDispatcher}
@@ -93,31 +91,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    maxWidth: 600,
-    minWidth: 360,
-    width: "100%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.3,
-    shadowRadius: 60,
-    elevation: 20,
-  },
-  content: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  contentContainer: {
-    padding: 20,
-  },
-});

@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
+import { styles } from "./EmptyState.styles";
 
 const EmptyState = () => {
   return (
@@ -10,26 +11,5 @@ const EmptyState = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    paddingVertical: 60,
-    paddingHorizontal: 40,
-  },
-  icon: {
-    fontSize: 80,
-    marginBottom: 20,
-  },
-  text: {
-    fontSize: 20,
-    color: "#999",
-    fontWeight: "500",
-  },
-  subtext: {
-    fontSize: 14,
-    color: "#9ca3af",
-  },
-});
 
 export default EmptyState;

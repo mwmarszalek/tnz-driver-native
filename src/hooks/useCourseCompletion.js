@@ -13,17 +13,14 @@ export const useCourseCompletion = (getMinutesToDeparture) => {
       return false;
     }
 
-    // Check if manually completed
     if (completedCourses[departureTime]?.completed) {
       return true;
     }
 
-    // Auto-complete if more than AUTO_COMPLETE_DELAY minutes past departure
     const minutesToDeparture = getMinutesToDeparture(departureTime);
     const autoCompleted =
       minutesToDeparture !== null && minutesToDeparture < -AUTO_COMPLETE_DELAY;
 
-    // Store auto-completed courses (but mark as NOT manual)
     if (autoCompleted && !completedCourses[departureTime]) {
       setCompletedCourses((prev) => ({
         ...prev,
@@ -35,7 +32,6 @@ export const useCourseCompletion = (getMinutesToDeparture) => {
   };
 
   const markAsCompleted = (time) => {
-    // Mark as completed manually
     setCompletedCourses({
       ...completedCourses,
       [time]: { completed: true, manual: true },
@@ -43,7 +39,6 @@ export const useCourseCompletion = (getMinutesToDeparture) => {
   };
 
   const markAsIncomplete = (time) => {
-    // Only allow unmarking if it was marked manually
     if (completedCourses[time]?.manual) {
       const updated = { ...completedCourses };
       delete updated[time];
