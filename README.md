@@ -1,315 +1,164 @@
-# TNZ Driver App - React Native
+# 🚌 Panel Kierowcy 904 - Aplikacja dla Kierowców
 
-Aplikacja mobilna dla kierowców transportu na żądanie (linia 904) z obsługą GPS w tle.
+Aplikacja mobilna- natywna dla kierowców transportu na zadanie z GPS w tle i synchronizacją Firebase.
 
-## Funkcje
+## 🎯 Główne Funkcje
 
-- 📍 Śledzenie lokalizacji GPS w tle (nawet z wyłączonym ekranem)
-- 🚌 Lista wszystkich kursów szkolnych z rozkładu
-- ✓ Oznaczanie kursów jako wykonane (manualne i automatyczne)
-- 🔔 Powiadomienie foreground service podczas aktywnego GPS
+- 📍 Śledzenie GPS w tle (nawet z wyłączonym ekranem, aktualizacja co 60s)
+- 🚌 Rozkład jazdy z listą kursów i zamówionymi przystankami
+- ✅ Oznaczanie kursów jako wykonane (manualne + automatyczne)
+- 🎯 Wyróżnienie najbliższego odjazdu (do 30 min)
+- 📞 Szybki kontakt z dyspozytorem jednym kliknięciem
 - 🔄 Synchronizacja w czasie rzeczywistym z Firebase
-- 📞 Szybki kontakt z dyspozytorem
-- ⏰ Automatyczne oznaczanie kursów wykonanych po 10 minutach od odjazdu
-- 🎯 Wyróżnienie najbliższego odjazdu
+- 🔔 Powiadomienie foreground service podczas aktywnego GPS
 
-## Wymagania
-
-- Node.js (wersja 18 lub nowsza)
-- npm lub yarn
-- Konto Expo (darmowe)
-- Android SDK (jeśli budujesz lokalnie)
-
-## Instalacja
-
-### 1. Zainstaluj zależności
+## 🚀 Szybki Start
 
 ```bash
-cd tnz-driver-native
+# Instalacja
 npm install
-```
 
-### 2. Zaloguj się do Expo
+# Uruchomienie lokalnie (Expo Go - bez GPS w tle)
+npm start
 
-```bash
-npx expo login
-```
-
-### 3. Skonfiguruj EAS Build
-
-```bash
+# Development build (z GPS w tle)
 npm install -g eas-cli
 eas login
-eas build:configure
-```
-
-Podczas konfiguracji:
-
-- Wybierz "All" gdy zapyta o platformy
-- Expo automatycznie utworzy `eas.json`
-
-### 4. Zaktualizuj Project ID
-
-Otwórz `app.json` i zmień `extra.eas.projectId` na ID swojego projektu:
-
-```json
-"extra": {
-  "eas": {
-    "projectId": "your-actual-project-id"
-  }
-}
-```
-
-Project ID otrzymasz po pierwszym `eas build:configure`.
-
-## Uruchomienie w trybie deweloperskim
-
-### Expo Go (szybki podgląd - BEZ background GPS)
-
-```bash
-npm start
-```
-
-Następnie zeskanuj kod QR aplikacją Expo Go.
-
-**UWAGA:** Background GPS nie działa w Expo Go! Potrzebujesz development build.
-
-### Development Build (z background GPS)
-
-```bash
 eas build --profile development --platform android
 ```
 
-Po zbudowaniu:
+**UWAGA:** GPS w tle działa tylko w development/production build, nie w Expo Go!
 
-1. Zainstaluj APK na urządzeniu
-2. Uruchom `npm start`
-3. Naciśnij "a" aby otworzyć na Androidzie
-
-## Budowanie APK
-
-### APK testowe (internal distribution)
+## 📱 Budowanie APK
 
 ```bash
+# Testowe (preview)
 eas build --platform android --profile preview
-```
 
-### APK produkcyjne (do publikacji)
-
-```bash
+# Produkcyjne (do publikacji)
 eas build --platform android --profile production
 ```
 
-Po zakończeniu budowania otrzymasz link do pobrania APK.
+## 🛠️ Technologie
 
-## Uprawnienia Android
+- React Native 0.81.5 + Expo ~54.0.0
+- Firebase Realtime Database
+- Expo Location (GPS tracking)
+- Expo Task Manager (background tasks)
+- React Navigation (nawigacja)
 
-Aplikacja wymaga następujących uprawnień:
-
-- `ACCESS_FINE_LOCATION` - dokładna lokalizacja GPS
-- `ACCESS_COARSE_LOCATION` - przybliżona lokalizacja
-- `ACCESS_BACKGROUND_LOCATION` - lokalizacja w tle
-- `FOREGROUND_SERVICE` - serwis w tle
-- `FOREGROUND_SERVICE_LOCATION` - serwis lokalizacji w tle
-
-## Architektura i struktura projektu
-
-Projekt został zorganizowany zgodnie z najlepszymi praktykami React Native (o których wiedziałem :P)
+## 📂 Struktura Projektu
 
 ```
-tnz-driver-native/
-├── App.js                          # Root app z NavigationContainer i Background Task
-├── app.json                        # Konfiguracja Expo
-├── eas.json                        # Konfiguracja EAS Build
-├── package.json                    # Zależności
-├── babel.config.js                 # Konfiguracja Babel
-├── src/
-│   ├── components/                 # Komponenty UI (reusable)
-│   │   ├── index.js                # Export wszystkich komponentów
-│   │   ├── Header.js               # Nagłówek z przyciskami GPS i dyspozytora
-│   │   ├── Header.styles.js        # Style dla Header
-│   │   ├── DepartureCard.js        # Karta kursu (główny komponent)
-│   │   ├── DepartureCard.styles.js # Style dla DepartureCard
-│   │   ├── NextBadge.js            # Badge "Najbliższy odjazd"
-│   │   ├── NextBadge.styles.js     # Style dla NextBadge
-│   │   ├── StopItem.js             # Element listy przystanków
-│   │   ├── StopItem.styles.js      # Style dla StopItem
-│   │   ├── NoStops.js              # Komunikat "Brak przystanków"
-│   │   ├── NoStops.styles.js       # Style dla NoStops
-│   │   ├── EmptyState.js           # Stan pustej listy
-│   │   └── EmptyState.styles.js    # Style dla EmptyState
-│   ├── hooks/                      # Custom React hooks
-│   │   ├── index.js                # Export wszystkich hooks
-│   │   ├── useSchedule.js          # Logika rozkładu jazdy i czasu
-│   │   ├── useLocationTracking.js  # Logika GPS tracking
-│   │   └── useCourseCompletion.js  # Logika oznaczania kursów
-│   ├── screens/                    # Ekrany aplikacji
-│   │   ├── HomeScreen.js           # Główny ekran
-│   │   └── HomeScreen.styles.js    # Style dla HomeScreen
-│   ├── styles/                     # System stylów
-│   │   └── theme.js                # Tylko zmienne: kolory, typografia, spacing, shadows
-│   ├── config/                     # Konfiguracja
-│   │   ├── firebase.js             # Firebase Realtime Database
-│   │   └── schedules.js            # Rozkład jazdy (dane)
-│   ├── constants/                  # Stałe aplikacji
-│   │   └── app.js                  # Wartości czasowe, konfiguracja
-│   └── utils/                      # Utility functions
-└── assets/                         # Ikony i splash screens
-    ├── icon.png
-    ├── adaptive-icon.png
-    └── splash.png
+src/
+├── components/
+│   ├── Header.jsx               # Nagłówek z GPS toggle + dyspozytorem
+│   ├── DepartureCard.jsx        # Karta kursu z przystankami
+│   ├── StopItem.jsx             # Element listy przystanków
+│   ├── NextBadge.jsx            # Badge "Najbliższy odjazd"
+│   └── EmptyState.jsx           # Pusty stan
+├── hooks/
+│   ├── useSchedule.js           # Rozkład jazdy + czas do odjazdu
+│   ├── useLocationTracking.js   # GPS tracking w tle
+│   └── useCourseCompletion.js   # Oznaczanie kursów
+├── screens/
+│   └── HomeScreen.jsx           # Główny ekran
+├── styles/
+│   └── theme.js                 # Kolory, typografia, spacing, shadows
+├── config/
+│   ├── firebase.js              # Firebase Realtime Database
+│   └── schedules.js             # Rozkład jazdy (dane)
+└── constants/
+    └── app.js                   # Stałe konfiguracyjne
 ```
 
-## Architektura komponentów
+## 🔧 Konfiguracja
 
-### Custom Hooks
+### Zmiana numeru dyspozytora
 
-Aplikacja używa trzech głównych custom hooks do zarządzania logiką:
-
-#### `useSchedule()`
-
-- Zarządza stanem rozkładu jazdy z Firebase
-- Obsługuje aktualizację czasu co minutę
-- Oblicza czas do odjazdu dla każdego kursu
-- Znajduje najbliższy odjazd
-
-#### `useLocationTracking()`
-
-- Zarządza GPS tracking w tle
-- Obsługuje uprawnienia do lokalizacji
-- Wysyła pozycję do Firebase co 60 sekund
-- Wspiera zarówno Web (mock GPS) jak i Native (prawdziwy GPS)
-
-#### `useCourseCompletion()`
-
-- Zarządza oznaczaniem kursów jako wykonane
-- Automatyczne oznaczanie po 10 minutach od odjazdu
-- Rozróżnia manualne vs automatyczne oznaczenia
-- Obsługuje cofanie tylko dla manualnych oznaczeń
-
-### Komponenty UI
-
-Wszystkie komponenty są w pełni modułowe i reusable:
-
-- **Header** - Nagłówek z przyciskami (GPS toggle, kontakt do dyspozytora)
-- **DepartureCard** - Główny komponent karty kursu z logiką wyświetlania
-- **NextBadge** - Pomarańczowy badge dla najbliższego odjazdu
-- **StopItem** - Element listy przystanków z numerem i czasem
-- **NoStops** - Komunikat gdy brak zamówionych przystanków
-- **EmptyState** - Stan pustej listy kursów
-
-### System Stylów
-
-Aplikacja używa prostego systemu stylów - każdy komponent ma swój plik `.styles.js`:
-
-**Struktura:**
-
-- `src/styles/theme.js` - **tylko zmienne** (colors, typography, spacing, borderRadius, shadows)
-- Każdy komponent ma osobny plik `.styles.js` obok głównego pliku
-
-**`src/styles/theme.js`** - Centralne zmienne:
-
-- `colors` - Paleta kolorów (primary, success, warning, text, background)
-- `typography` - Rozmiary czcionek i wagi (xs → huge, normal → extrabold)
-- `spacing` - Wartości odstępów (xs: 4px → massive: 60px)
-- `borderRadius` - Zaokrąglenia (sm: 8px → full: 9999px)
-- `shadows` - Pre-defined cienie (sm, md, lg, xl + color-specific)
-
-**Przykład - DepartureCard:**
+Edytuj `src/constants/app.js`:
 
 ```javascript
-// DepartureCard.js
-import { View, Text } from "react-native";
-import { styles } from "./DepartureCard.styles";
-
-const DepartureCard = () => {
-  return <View style={styles.container}>...</View>;
-};
-
-// DepartureCard.styles.js
-import { StyleSheet } from "react-native";
-import { colors, spacing, shadows } from "../styles/theme";
-
-export const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.primary,
-    padding: spacing.xl,
-    ...shadows.lg,
-  },
-});
+export const DISPATCHER_PHONE = "123456789";
 ```
 
-**Zalety:**
+### Zmiana rozkładu jazdy
 
-- ✅ Prosty i przejrzysty - każdy komponent ma swoje style
-- ✅ Łatwe w utrzymaniu - style obok logiki komponentu
-- ✅ Brak nadmiernej abstrakcji - tylko używane wartości
+Edytuj `src/config/schedules.js`:
 
-## Zasady działania
+```javascript
+export const schedule = {
+  "07:10": {
+    stops: ["SKM Podjuchy", "Metalowa", "..."],
+    times: { "SKM Podjuchy": "07:10", Metalowa: "07:12" },
+  },
+};
+```
+
+### Inne stałe w `src/constants/app.js`
+
+- `LOCATION_UPDATE_INTERVAL` - interwał GPS (60000ms)
+- `AUTO_COMPLETE_DELAY` - auto-complete po 10 minutach
+- `END_OF_DAY_HOUR` - ukrycie kursów po 17:00
+- `NEXT_DEPARTURE_WINDOW` - okno następnego kursu (30 min)
+
+## 🗄️ Przechowywanie Danych
+
+**Firebase Realtime Database:**
+
+- `savedSchedules/{key}` - zamówione przystanki dla kursów
+- `driverLocation` - pozycja GPS kierowcy (lat, lng, accuracy, timestamp)
+- `driverGPSEnabled` - status włączenia/wyłączenia GPS
+
+**Przykład danych GPS:**
+
+```json
+{
+  "latitude": 54.352025,
+  "longitude": 18.646638,
+  "accuracy": 10,
+  "timestamp": 1234567890
+}
+```
+
+## ⚙️ Jak Działa
 
 ### Oznaczanie kursów
 
-1. **Manualne oznaczenie** - kierowca klika "Oznacz jako wykonany"
-
-   - Przycisk pojawia się gdy minie godzina odjazdu
-   - Można cofnąć przyciskiem "Cofnij" (niebieski)
-
-2. **Automatyczne oznaczenie** - system oznacza po 10 minutach
-   - Kursy automatycznie oznaczone NIE mogą być cofnięte
-   - Zapobiega to przypadkowemu cofnięciu przez kierowcę
+1. **Manualne** - przycisk "Oznacz jako wykonany" po godzinie odjazdu
+   - Można cofnąć przyciskiem "Cofnij"
+2. **Automatyczne** - system oznacza po 10 minutach od odjazdu
+   - NIE można cofnąć (zapobiega przypadkowemu cofnięciu)
 
 ### GPS Tracking
 
 - Aktualizacja pozycji co 60 sekund
-- Działa w tle (foreground service)
-- Powiadomienie "TNZ GPS Aktywny" gdy aktywne
-- Zapisuje pozycję w Firebase: `driverLocation/`
+- Działa w tle jako foreground service
+- Powiadomienie "TNZ GPS Aktywny" podczas działania
+- Wysyła dane do Firebase: `driverLocation/`
 
-## Firebase
+### Custom Hooks
 
-Aplikacja używa Firebase Realtime Database do:
+- **useSchedule()** - rozkład z Firebase, obliczenia czasu, najbliższy kurs
+- **useLocationTracking()** - GPS, uprawnienia, wysyłka do Firebase co 60s
+- **useCourseCompletion()** - manualne/auto oznaczanie, cofanie tylko dla manualnych
 
-- `savedSchedules/` - zamówione przystanki dla poszczególnych kursów
-- `driverLocation/` - bieżąca pozycja GPS kierowcy
-  ```json
-  {
-    "latitude": 53.416454,
-    "longitude": 14.549563,
-    "accuracy": 10,
-    "timestamp": 1234567890
-  }
-  ```
-- `driverGPSEnabled` - status włączenia/wyłączenia GPS (boolean)
+## 🐛 Rozwiązywanie Problemów
 
-## Stałe konfiguracyjne
+**GPS nie działa w tle:**
 
-Wszystkie stałe znajdują się w `src/constants/app.js`:
+- Testuj na fizycznym urządzeniu (nie w emulatorze)
+- Sprawdź uprawnienia do lokalizacji w tle w ustawieniach Androida
+- Użyj development/production build (NIE Expo Go)
 
-- `LOCATION_UPDATE_INTERVAL` - 60000ms (60 sekund)
-- `AUTO_COMPLETE_DELAY` - 10 minut
-- `END_OF_DAY_HOUR` - 17 (5 PM)
-- `NEXT_DEPARTURE_WINDOW` - 30 minut
-- `COLORS` - paleta kolorów aplikacji
-
-## Rozwiązywanie problemów
-
-### GPS nie działa w tle
-
-1. Upewnij się, że testujesz na fizycznym urządzeniu (nie w emulatorze)
-2. Sprawdź czy aplikacja ma uprawnienia do lokalizacji w tle w ustawieniach Androida
-3. Użyj development build lub production build (NIE Expo Go)
-
-### Build fails
+**Build fails:**
 
 ```bash
-# Wyczyść cache i spróbuj ponownie
 eas build --clear-cache
 eas build --platform android
 ```
 
-### Aplikacja się crashuje
-
-Sprawdź logi:
+**Sprawdzanie logów:**
 
 ```bash
 npx react-native log-android
@@ -317,29 +166,17 @@ npx react-native log-android
 adb logcat
 ```
 
-## Development
+## 📋 Wymagane Uprawnienia Android
 
-### Dodawanie nowego komponentu
+- `ACCESS_FINE_LOCATION` - dokładna lokalizacja GPS
+- `ACCESS_BACKGROUND_LOCATION` - lokalizacja w tle
+- `FOREGROUND_SERVICE` - serwis w tle
+- `FOREGROUND_SERVICE_LOCATION` - serwis lokalizacji w tle
 
-1. Stwórz plik komponentu: `src/components/NazwaKomponentu.js`
-2. Stwórz plik stylów: `src/components/NazwaKomponentu.styles.js`
-3. Import zmiennych z `theme.js`: `import { colors, spacing } from "../styles/theme"`
-4. Dodaj export w `src/components/index.js`
+## 👥 Autor
 
-### Dodawanie nowego hooka
+**Michał Marszałek**
 
-1. Stwórz plik w `src/hooks/useNazwaHooka.js`
-2. Exportuj jako named export
-3. Dodaj export w `src/hooks/index.js`
+---
 
-### Modyfikacja stałych
-
-Edytuj `src/constants/app.js` - wszystkie wartości są tam scentralizowane.
-
-## Kontakt
-
-W przypadku problemów sprawdź dokumentację Expo:
-
-- https://docs.expo.dev
-- https://docs.expo.dev/build/introduction/
-- https://docs.expo.dev/versions/latest/sdk/location/
+**Ostatnia aktualizacja:** Grudzień 2026
